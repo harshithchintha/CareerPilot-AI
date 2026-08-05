@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: career-copilot-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build
+    startCommand: pnpm --filter @workspace/api-server run start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false

@@ -1,0 +1,1436 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: AI Career Copilot API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: users
+    description: User profile operations
+  - name: resumes
+    description: Resume management and AI analysis
+  - name: jobs
+    description: Job description management
+  - name: roadmaps
+    description: Personalized learning roadmaps
+  - name: interviews
+    description: AI mock interview sessions
+  - name: coverletters
+    description: AI-generated cover letters
+  - name: chat
+    description: AI career chatbot
+  - name: dashboard
+    description: Career progress and stats
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ── Users ──────────────────────────────────────────────────────────────────
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Unauthorized
+    put:
+      operationId: updateMe
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileUpdate"
+      responses:
+        "200":
+          description: Updated user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  # ── Resumes ────────────────────────────────────────────────────────────────
+  /resumes:
+    get:
+      operationId: listResumes
+      tags: [resumes]
+      summary: List all resumes for the current user
+      responses:
+        "200":
+          description: List of resumes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Resume"
+    post:
+      operationId: createResume
+      tags: [resumes]
+      summary: Upload or create a resume
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResumeInput"
+      responses:
+        "201":
+          description: Created resume
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resume"
+
+  /resumes/{id}:
+    get:
+      operationId: getResume
+      tags: [resumes]
+      summary: Get a single resume
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Resume
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resume"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteResume
+      tags: [resumes]
+      summary: Delete a resume
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  /resumes/{id}/analyze:
+    post:
+      operationId: analyzeResume
+      tags: [resumes]
+      summary: Run AI analysis on a resume (ATS score, suggestions, skill gaps)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeAnalysis"
+
+  /resumes/{id}/analysis:
+    get:
+      operationId: getResumeAnalysis
+      tags: [resumes]
+      summary: Get the latest analysis for a resume
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeAnalysis"
+        "404":
+          description: No analysis yet
+
+  /resumes/{id}/improve:
+    post:
+      operationId: getResumeImprovements
+      tags: [resumes]
+      summary: Get detailed resume improvement suggestions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Improvement suggestions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeImprovements"
+
+  # ── Job Descriptions ───────────────────────────────────────────────────────
+  /jobs:
+    get:
+      operationId: listJobs
+      tags: [jobs]
+      summary: List all saved job descriptions
+      responses:
+        "200":
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JobDescription"
+    post:
+      operationId: createJob
+      tags: [jobs]
+      summary: Save a job description
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobDescriptionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDescription"
+
+  /jobs/{id}:
+    get:
+      operationId: getJob
+      tags: [jobs]
+      summary: Get a job description
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Job description
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDescription"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteJob
+      tags: [jobs]
+      summary: Delete a job description
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  /jobs/{id}/match:
+    post:
+      operationId: matchJobWithResume
+      tags: [jobs]
+      summary: Match a job description with a resume to compute similarity and skill gaps
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobMatchRequest"
+      responses:
+        "200":
+          description: Match result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobMatch"
+
+  /jobs/{id}/matches:
+    get:
+      operationId: listJobMatches
+      tags: [jobs]
+      summary: List all resume matches for a job description
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of matches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JobMatch"
+
+  # ── Learning Roadmaps ──────────────────────────────────────────────────────
+  /roadmaps:
+    get:
+      operationId: listRoadmaps
+      tags: [roadmaps]
+      summary: List all learning roadmaps for the current user
+      responses:
+        "200":
+          description: List of roadmaps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LearningRoadmap"
+
+  /roadmaps/generate:
+    post:
+      operationId: generateRoadmap
+      tags: [roadmaps]
+      summary: Generate a personalized learning roadmap based on skill gaps
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoadmapGenerateRequest"
+      responses:
+        "201":
+          description: Created roadmap
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LearningRoadmap"
+
+  /roadmaps/{id}:
+    get:
+      operationId: getRoadmap
+      tags: [roadmaps]
+      summary: Get a learning roadmap
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Roadmap
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LearningRoadmap"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteRoadmap
+      tags: [roadmaps]
+      summary: Delete a roadmap
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  /roadmaps/{id}/steps/{stepId}/complete:
+    patch:
+      operationId: toggleRoadmapStep
+      tags: [roadmaps]
+      summary: Toggle completion of a roadmap step
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+        - name: stepId
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StepToggle"
+      responses:
+        "200":
+          description: Updated step
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoadmapStep"
+
+  # ── Mock Interviews ────────────────────────────────────────────────────────
+  /interviews:
+    get:
+      operationId: listInterviews
+      tags: [interviews]
+      summary: List all mock interview sessions
+      responses:
+        "200":
+          description: List of interviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MockInterview"
+    post:
+      operationId: createInterview
+      tags: [interviews]
+      summary: Start a new mock interview session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterviewInput"
+      responses:
+        "201":
+          description: Created interview session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MockInterview"
+
+  /interviews/{id}:
+    get:
+      operationId: getInterview
+      tags: [interviews]
+      summary: Get an interview session with all questions and answers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Interview with questions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MockInterviewDetail"
+        "404":
+          description: Not found
+
+  /interviews/{id}/next-question:
+    post:
+      operationId: getNextQuestion
+      tags: [interviews]
+      summary: Generate the next interview question
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Next question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterviewQuestion"
+
+  /interviews/{id}/answer:
+    post:
+      operationId: submitAnswer
+      tags: [interviews]
+      summary: Submit an answer and receive AI feedback
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerInput"
+      responses:
+        "200":
+          description: Feedback on the answer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnswerFeedback"
+
+  /interviews/{id}/complete:
+    post:
+      operationId: completeInterview
+      tags: [interviews]
+      summary: Mark an interview as complete and get overall feedback
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Completed interview with summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MockInterview"
+
+  # ── Cover Letters ──────────────────────────────────────────────────────────
+  /cover-letters:
+    get:
+      operationId: listCoverLetters
+      tags: [coverletters]
+      summary: List all saved cover letters
+      responses:
+        "200":
+          description: List of cover letters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CoverLetter"
+    post:
+      operationId: generateCoverLetter
+      tags: [coverletters]
+      summary: Generate a cover letter for a job application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoverLetterRequest"
+      responses:
+        "201":
+          description: Generated cover letter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverLetter"
+
+  /cover-letters/{id}:
+    get:
+      operationId: getCoverLetter
+      tags: [coverletters]
+      summary: Get a cover letter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Cover letter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverLetter"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteCoverLetter
+      tags: [coverletters]
+      summary: Delete a cover letter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Chat (AI Career Chatbot) ───────────────────────────────────────────────
+  /chat/conversations:
+    get:
+      operationId: listChatConversations
+      tags: [chat]
+      summary: List all chatbot conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatConversation"
+    post:
+      operationId: createChatConversation
+      tags: [chat]
+      summary: Start a new chatbot conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatConversationInput"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatConversation"
+
+  /chat/conversations/{id}:
+    get:
+      operationId: getChatConversation
+      tags: [chat]
+      summary: Get a conversation with all messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatConversationDetail"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteChatConversation
+      tags: [chat]
+      summary: Delete a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  /chat/conversations/{id}/messages:
+    post:
+      operationId: sendChatMessage
+      tags: [chat]
+      summary: Send a message and receive a streaming AI response (SSE)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatMessageInput"
+      responses:
+        "200":
+          description: SSE stream of AI response chunks
+          content:
+            text/event-stream: {}
+
+  # ── Dashboard ──────────────────────────────────────────────────────────────
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get career progress stats and summary
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/activity:
+    get:
+      operationId: getDashboardActivity
+      tags: [dashboard]
+      summary: Get recent activity feed
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    # ── Users ──────────────────────────────────────────────────────────────
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: number
+        clerkId:
+          type: string
+        email:
+          type: string
+        name:
+          type: ["string", "null"]
+        targetRole:
+          type: ["string", "null"]
+        experienceLevel:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - clerkId
+        - email
+        - createdAt
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        targetRole:
+          type: string
+        experienceLevel:
+          type: string
+        bio:
+          type: string
+
+    # ── Resumes ────────────────────────────────────────────────────────────
+    Resume:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        content:
+          type: string
+        atsScore:
+          type: ["number", "null"]
+        isDefault:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - content
+        - isDefault
+        - createdAt
+        - updatedAt
+
+    ResumeInput:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        isDefault:
+          type: boolean
+      required:
+        - title
+        - content
+
+    ResumeAnalysis:
+      type: object
+      properties:
+        id:
+          type: number
+        resumeId:
+          type: number
+        atsScore:
+          type: number
+        overallFeedback:
+          type: string
+        strengths:
+          type: array
+          items:
+            type: string
+        weaknesses:
+          type: array
+          items:
+            type: string
+        keywordsSuggested:
+          type: array
+          items:
+            type: string
+        skillsFound:
+          type: array
+          items:
+            type: string
+        skillsMissing:
+          type: array
+          items:
+            type: string
+        formattingScore:
+          type: number
+        contentScore:
+          type: number
+        impactScore:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - resumeId
+        - atsScore
+        - overallFeedback
+        - strengths
+        - weaknesses
+        - keywordsSuggested
+        - skillsFound
+        - skillsMissing
+        - formattingScore
+        - contentScore
+        - impactScore
+        - createdAt
+
+    ResumeImprovements:
+      type: object
+      properties:
+        resumeId:
+          type: number
+        suggestions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImprovementSuggestion"
+        rewrittenSections:
+          type: array
+          items:
+            $ref: "#/components/schemas/RewrittenSection"
+      required:
+        - resumeId
+        - suggestions
+        - rewrittenSections
+
+    ImprovementSuggestion:
+      type: object
+      properties:
+        section:
+          type: string
+        issue:
+          type: string
+        suggestion:
+          type: string
+        priority:
+          type: string
+      required:
+        - section
+        - issue
+        - suggestion
+        - priority
+
+    RewrittenSection:
+      type: object
+      properties:
+        section:
+          type: string
+        original:
+          type: string
+        improved:
+          type: string
+      required:
+        - section
+        - original
+        - improved
+
+    # ── Job Descriptions ───────────────────────────────────────────────────
+    JobDescription:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        company:
+          type: ["string", "null"]
+        description:
+          type: string
+        requiredSkills:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - description
+        - requiredSkills
+        - createdAt
+
+    JobDescriptionInput:
+      type: object
+      properties:
+        title:
+          type: string
+        company:
+          type: string
+        description:
+          type: string
+      required:
+        - title
+        - description
+
+    JobMatchRequest:
+      type: object
+      properties:
+        resumeId:
+          type: number
+      required:
+        - resumeId
+
+    JobMatch:
+      type: object
+      properties:
+        id:
+          type: number
+        jobId:
+          type: number
+        resumeId:
+          type: number
+        similarityScore:
+          type: number
+        matchedSkills:
+          type: array
+          items:
+            type: string
+        missingSkills:
+          type: array
+          items:
+            type: string
+        recommendation:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - jobId
+        - resumeId
+        - similarityScore
+        - matchedSkills
+        - missingSkills
+        - recommendation
+        - createdAt
+
+    # ── Learning Roadmaps ──────────────────────────────────────────────────
+    LearningRoadmap:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        targetRole:
+          type: string
+        description:
+          type: string
+        totalSteps:
+          type: number
+        completedSteps:
+          type: number
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoadmapStep"
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - targetRole
+        - description
+        - totalSteps
+        - completedSteps
+        - steps
+        - createdAt
+
+    RoadmapStep:
+      type: object
+      properties:
+        id:
+          type: number
+        roadmapId:
+          type: number
+        title:
+          type: string
+        description:
+          type: string
+        resourceUrl:
+          type: ["string", "null"]
+        resourceType:
+          type: string
+        estimatedHours:
+          type: ["number", "null"]
+        orderIndex:
+          type: number
+        isCompleted:
+          type: boolean
+      required:
+        - id
+        - roadmapId
+        - title
+        - description
+        - resourceType
+        - orderIndex
+        - isCompleted
+
+    RoadmapGenerateRequest:
+      type: object
+      properties:
+        targetRole:
+          type: string
+        currentSkills:
+          type: array
+          items:
+            type: string
+        missingSkills:
+          type: array
+          items:
+            type: string
+        resumeId:
+          type: ["number", "null"]
+        jobId:
+          type: ["number", "null"]
+      required:
+        - targetRole
+
+    StepToggle:
+      type: object
+      properties:
+        isCompleted:
+          type: boolean
+      required:
+        - isCompleted
+
+    # ── Mock Interviews ────────────────────────────────────────────────────
+    MockInterview:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        role:
+          type: string
+        interviewType:
+          type: string
+        status:
+          type: string
+        totalQuestions:
+          type: number
+        answeredQuestions:
+          type: number
+        overallScore:
+          type: ["number", "null"]
+        overallFeedback:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - title
+        - role
+        - interviewType
+        - status
+        - totalQuestions
+        - answeredQuestions
+        - createdAt
+
+    MockInterviewDetail:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        role:
+          type: string
+        interviewType:
+          type: string
+        status:
+          type: string
+        totalQuestions:
+          type: number
+        answeredQuestions:
+          type: number
+        overallScore:
+          type: ["number", "null"]
+        overallFeedback:
+          type: ["string", "null"]
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/InterviewQuestion"
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - title
+        - role
+        - interviewType
+        - status
+        - totalQuestions
+        - answeredQuestions
+        - questions
+        - createdAt
+
+    InterviewQuestion:
+      type: object
+      properties:
+        id:
+          type: number
+        interviewId:
+          type: number
+        question:
+          type: string
+        questionType:
+          type: string
+        orderIndex:
+          type: number
+        userAnswer:
+          type: ["string", "null"]
+        feedback:
+          type: ["string", "null"]
+        score:
+          type: ["number", "null"]
+        isAnswered:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - interviewId
+        - question
+        - questionType
+        - orderIndex
+        - isAnswered
+        - createdAt
+
+    InterviewInput:
+      type: object
+      properties:
+        role:
+          type: string
+        interviewType:
+          type: string
+        totalQuestions:
+          type: number
+        resumeId:
+          type: ["number", "null"]
+        jobId:
+          type: ["number", "null"]
+      required:
+        - role
+        - interviewType
+
+    AnswerInput:
+      type: object
+      properties:
+        questionId:
+          type: number
+        answer:
+          type: string
+      required:
+        - questionId
+        - answer
+
+    AnswerFeedback:
+      type: object
+      properties:
+        questionId:
+          type: number
+        feedback:
+          type: string
+        score:
+          type: number
+        tips:
+          type: array
+          items:
+            type: string
+        exampleAnswer:
+          type: string
+      required:
+        - questionId
+        - feedback
+        - score
+        - tips
+        - exampleAnswer
+
+    # ── Cover Letters ──────────────────────────────────────────────────────
+    CoverLetter:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        content:
+          type: string
+        resumeId:
+          type: ["number", "null"]
+        jobId:
+          type: ["number", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - content
+        - createdAt
+
+    CoverLetterRequest:
+      type: object
+      properties:
+        resumeId:
+          type: number
+        jobId:
+          type: number
+        tone:
+          type: string
+      required:
+        - resumeId
+        - jobId
+
+    # ── Chat ───────────────────────────────────────────────────────────────
+    ChatConversation:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        messageCount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - messageCount
+        - createdAt
+        - updatedAt
+
+    ChatConversationDetail:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - messages
+        - createdAt
+        - updatedAt
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: number
+        conversationId:
+          type: number
+        role:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - conversationId
+        - role
+        - content
+        - createdAt
+
+    ChatConversationInput:
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+        - title
+
+    ChatMessageInput:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    # ── Dashboard ──────────────────────────────────────────────────────────
+    DashboardStats:
+      type: object
+      properties:
+        resumeCount:
+          type: number
+        avgAtsScore:
+          type: ["number", "null"]
+        jobsTracked:
+          type: number
+        interviewsCompleted:
+          type: number
+        avgInterviewScore:
+          type: ["number", "null"]
+        roadmapsActive:
+          type: number
+        stepsCompleted:
+          type: number
+        coverLettersGenerated:
+          type: number
+        topSkillGaps:
+          type: array
+          items:
+            type: string
+        recentAtsScores:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScorePoint"
+      required:
+        - resumeCount
+        - jobsTracked
+        - interviewsCompleted
+        - roadmapsActive
+        - stepsCompleted
+        - coverLettersGenerated
+        - topSkillGaps
+        - recentAtsScores
+
+    ScorePoint:
+      type: object
+      properties:
+        date:
+          type: string
+        score:
+          type: number
+        label:
+          type: string
+      required:
+        - date
+        - score
+        - label
+
+    ActivityItem:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - type
+        - title
+        - description
+        - createdAt

@@ -1,0 +1,51 @@
+You are a senior Full Stack AI Engineer and Product Architect.
+
+Build a production-ready AI Career Copilot web application that helps students and job seekers become job-ready.
+
+Problem Statement:
+Millions of students and graduates struggle to secure internships and jobs due to poorly optimized resumes, lack of interview preparation, and limited awareness of the skills required for their target roles. Existing platforms provide fragmented solutions, making career preparation inefficient.
+
+Objective:
+Develop an AI-powered Career Copilot that provides personalized career guidance by analyzing resumes, matching them with job descriptions, identifying skill gaps, optimizing resumes for ATS, conducting AI-powered mock interviews, and generating personalized learning roadmaps to improve employability.
+
+Core Features:
+- Secure authentication
+- Dashboard
+- Resume upload and AI analysis
+- ATS score and optimization suggestions
+- Job Description matching with similarity score
+- Skill gap analysis
+- Personalized learning roadmap
+- AI Career Chatbot
+- AI Mock Interview with feedback
+- Interview question generation
+- Resume improvement suggestions
+- Cover letter generation
+- Project recommendations
+- Career progress tracking
+- Saved reports and history
+
+Tech Stack:
+- React.js
+- Node.js + Express.js
+- PostgreSQL (Supabase)
+- Supabase Authentication
+- Google Gemini API
+- Tailwind CSS
+- Zod validation
+
+Requirements:
+- Responsive modern UI
+- Secure backend APIs
+- Production-ready folder structure
+- Clean architecture
+- Proper error handling
+- Database schema
+- REST APIs
+- Environment variables
+- Authentication and authorization
+- Input validation
+- AI prompts optimized for structured JSON responses
+- Well-commented, maintainable code
+
+Generate the complete application from scratch without placeholders or skipped steps. Build one feature completely before moving to the next, ensuring every module is fully functional, integrated, and production-ready.

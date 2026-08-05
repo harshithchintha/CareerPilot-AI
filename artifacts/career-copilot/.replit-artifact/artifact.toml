@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "AI Career Copilot"
+description = "A full-stack AI-powered career guidance platform that helps students and job seekers become job-ready. Features resume upload and AI analysis, ATS scoring, job description matching, skill gap analysis, personalized learning roadmaps, AI mock interviews, cover letter generation, and an AI career chatbot — all powered by Google Gemini."
+version = "1.0.0"
+id = "artifacts/career-copilot"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25091
+
+[services.development]
+run = "pnpm --filter @workspace/career-copilot run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/career-copilot", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/career-copilot/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25091"
+BASE_PATH = "/"
