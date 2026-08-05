@@ -1,12 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm --filter @workspace/career-copilot run build",
-  "outputDirectory": "artifacts/career-copilot/dist/public",
+  "outputDirectory": "dist/public",
   "framework": "vite",
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "destination": "https://career-copilot-api.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",

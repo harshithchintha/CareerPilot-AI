@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config vite.config.ts --host 0.0.0.0",
-    "build": "vite build --config vite.config.ts",
+    "build": "vite build --config vite.config.ts && node -e \"import('fs').then(fs => fs.mkdirSync('../../dist/public', {recursive: true}) || fs.cpSync('dist/public', '../../dist/public', {recursive: true}))\"",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
