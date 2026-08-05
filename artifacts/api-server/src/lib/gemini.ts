@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 const apiKey = process.env.GEMINI_API_KEY;
 export const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
-// Configured for Gemini Flash model (supports gemini-2.5-flash / gemini-1.5-flash / gemini-2.0-flash)
+// Configured for Gemini 3.6 Flash / Gemini 2.5 Flash model
 export const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 /**
